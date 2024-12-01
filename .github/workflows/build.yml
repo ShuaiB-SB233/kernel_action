@@ -39,7 +39,7 @@ jobs:
           PATH=$CLANG:$GCC64:$GCC32:$PATH
           export PATH
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi CLANG_TRIPLE=aarch64-linux-gnu- CC=clang O=out DTC_EXT=$(pwd)/tools/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y CONFIG_SECTION_MISMATCH_WARN_ONLY=y vendor/o1q_chn_openx_defconfig -j12
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi CLANG_TRIPLE=aarch64-linux-gnu- CC=clang O=out DTC_EXT=$(pwd)/tools/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j12  
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi CLANG_TRIPLE=aarch64-linux-gnu- CC=clang O=out DTC_EXT=$(pwd)/tools/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j12  
     
       - name: Upload kernel Image
         uses: actions/upload-artifact@v4
