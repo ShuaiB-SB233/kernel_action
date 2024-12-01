@@ -1,0 +1,48 @@
+name: Build OneUI's Kernel
+on: 
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: ["G9910ZCS9GXJ2"]
+jobs: 
+  build-oneui:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps: 
+      - name: Clone Toolchains
+        run: |
+          sudo apt update -y
+          sudo apt upgrade -y
+          sudo apt-get install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3 -y
+          sudo apt clean
+          wget "https://android.googlesource.com/platform//prebuilts/clang/host/linux-x86/+archive/4c6fbc28d3b078a5308894fc175f962bb26a5718/clang-r383902b1.tar.gz" -O clang.tar.gz
+          mkdir -p toolchains/clang
+          cd toolchains/clang
+          tar -xzpvf ../../clang.tar.gz
+          cd ../../
+          git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git ~/toolchains/gcc64 --depth=1
+          git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git ~/toolchains/gcc32 --depth=1
+          
+      - name: checkout kernel (OneUI)
+        uses: actions/checkout@v3
+        with:
+          repository: ShuaiB-SB233/kernel_samsung_o1q
+          ref: G9910ZCS9GXJ2
+          submodule: recursive
+        
+      - name: Compile Kernel
+        run: |
+          CLANG=~/toolchains/clang/bin
+          GCC32=~/toolchains/gcc32/bin
+          GCC64=~/toolchains/gcc64/bin
+          PATH=$CLANG:$GCC64:$GCC32:$PATH
+          export PATH
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi CLANG_TRIPLE=aarch64-linux-gnu- CC=clang O=out DTC_EXT=$(pwd)/tools/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y CONFIG_SECTION_MISMATCH_WARN_ONLY=y vendor/o1q_chn_openx_defconfig -j12
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi CLANG_TRIPLE=aarch64-linux-gnu- CC=clang O=out DTC_EXT=$(pwd)/tools/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j12  
+    
+      - name: Upload kernel Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kernel_OneUI_S21-Snapdragen
+          path: out/arch/arm64/boot/*
